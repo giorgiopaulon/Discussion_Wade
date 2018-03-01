@@ -1,0 +1,210 @@
+---
+title: "Discussion of Wade and Ghahramani"
+author: 
+- name: Giorgio Paulon, Peter Müller, Lorenzo Trippa
+  affiliation: The University of Texas at Austin
+date: March 1, 2018
+
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float:
+      collapsed: false
+    theme: spacelab
+    highlight: default
+bibliography: refs.bib
+header-includes:
+- \usepackage{amsmath}
+- \usepackage{setspace}
+- \usepackage{avant}
+- \usepackage{bm}
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+opts_chunk$set(dev = 'pdf')
+options(warn=-1)
+```
+
+## Introduction 
+We thank the authors for an interesting discussion of estimates  and
+uncertainty summaries for  random partitions. A coherent description of
+uncertainties is one of the strengths of the Bayesian approach, but
+it is difficult to summarize and report it in the case of a random partition.
+The clever and elegant approach of Wade and Ghahramani addresses this critical gap in the literature. 
+
+However, the approach relies on loss functions that ignore
+the underlying inference problem that gave rise to the random
+partition.  In other words, the loss functions are generic inference
+losses that ignore the context of the scientific question that the
+investigators are trying to address.
+
+In this discussion we would like to elaborate on the authors'
+related comment that alternative loss functions could be tailored to
+specific problems. 
+
+## The proposed alternative
+
+We assume that the inference problem and sampling model include
+cluster-specific parameters, $\boldsymbol{\theta}_j$, $j=1,\ldots,k_N$.
+For example, if $\boldsymbol{\theta}_j$ were the mean times to progression for
+patients in a clinical trial, the clusters would describe patient
+subpopulations with different mean time to progression. A summary of
+the random partition should then focus on partitions with meaningfully
+different $\boldsymbol{\theta}_j$'s.  Similarly, in some contexts, one might
+prefer avoiding  inclusion and reporting  of small  clusters.  
+Inspired by \cite{Xu&al:15} who use a determinantal point process to
+favor configurations with diverse cluster-specific parameters we
+propose the following loss function.  The loss function formalizes a
+tradeoff between reporting clusters that are representative of the
+posterior and, with the second term, favoring partitions with clusters
+$C_j$ that are diverse:
+$$
+  L_{rep} (\boldsymbol{c}, \widehat{\boldsymbol{c}}, \boldsymbol{\theta}^\star,
+  \widehat{\boldsymbol{\theta}}^\star) = \frac{1}{N} \sum_{n=1}^N \left(
+  \theta_{c_n}^\star - \widehat{\theta}_{\widehat{\boldsymbol{c}}_n}^\star \right)^2 -
+  \lambda \det (\widehat{\Phi}), 
+$$
+where $[\widehat{\Phi}_{ij}]_{i,j} = \phi_\tau (\widehat{\theta}_i^\star,
+\widehat{\theta}_j^\star)$  for some kernel $\phi_\tau(x, y)$,
+e.g. the squared exponential $\phi_\tau(x, y) = \exp\{ -
+0.5 \left[ (x-y)/\tau \right]^2\}$. That is, $\det ( \widehat{\Phi})$ is
+the volume of a parallelotope spanned by the columns of $\widehat{\Phi}$,
+which is zero when $\theta_i^\star = \theta_j^\star$ for any $i \neq
+j$, and maximized when they are very distinct.
+Of course  the squared distance in the loss can be replaced by a different 
+ distance,   e.g. one that allows for asymmetric
+costs of misfit.   
+The second component of the loss function could also be modified to
+mirror specific goals, for example penalizing configurations that
+include small clusters. 
+The point here is that, in general, the particular
+application should drive the choice of the loss function.
+
+We compared $L_{rep}$ with the VI loss and also with the
+squared loss \citep{Dahl:2006}
+in the following example.
+Let $\mathcal{N}(x;\; m,s)$ denote a normal p.d.f. with location $m$ and
+scale $s$ evaluated at $x$, and let
+$\boldsymbol{\mu} = (-3, -3.5, -2.6, 0, 1.8, 2.4, 7.1)$.
+We simulated $N = 1000$ observations  from a mixture of
+7 normals,
+$p(x_i \mid \boldsymbol{\mu}) \propto \sum_{j=1}^7 \mathcal{N}(x_i;\; \mu_j,1)$. 
+We fit the data using a Dirichlet process mixture of normals model. In
+this case, only four components of the mixture are likely to be
+practically meaningful. The three values around -3 and the two
+around 2 are not meaningfully different (relative to the variances in
+the normal kernels).  Inference summaries under $L_{rep}$ and VI loss are
+shown in Figure \ref{mixturecomparison}. 
+\begin{figure}  
+\begin{tabular}{cc}
+  \includegraphics[width=.45\linewidth]{Latex/Img/mixture_proposed}&
+  \includegraphics[width=.45\linewidth]{Latex/Img/mixture_wade}\\
+  (a) optimal $\chat$ under $L_{rep}$ & (b) under VI\\
+  \end{tabular}
+\caption{
+  Optimal $\chat$ for the normal mixture example.
+  The histogram shows the data; the
+  black curve shows the estimated posterior mean of the random
+  probability measure, along with pointwise $95\%$ credible intervals.
+  Color shows the estimated cluster membership for $x_i$.}
+\label{mixturecomparison}
+\end{figure}
+In this example the posterior mode for $k_N$ is $\widehat{k}_N=7$. But both
+loss functions penalize excessive complexity and shrink the reported partition
+to the 4 groups shown in the figure.
+Although the VI loss does not explicitly favor easy interpretation, it
+does surprisingly well in this example.
+
+We used an implementation that restricted the search for the Bayes
+estimate of the partition under $L_{rep}$ to the  simulated partitions only, which
+might explain the counter-intuitive lack of monotonicity in the
+cluster membership in Figure 1a.  One could alternatively use better
+search algorithms such as, for example, the sequentially-allocated
+latent structure optimization (SALSO) in the \texttt{sdols} R package
+\citep{sdols:2017}.  We do not show the results obtained under squared
+loss or Binder's loss, since both clearly overfit the data
+reporting $k_N=53$ components.
+
+Next we investigate a scenario with a small number of observations. We
+compare the same two loss functions with a dataset from a clinical trial for sarcoma  patients with binary endpoints (tumor
+response) \citep{Leon&al:2013}.
+The goal of the study is to cluster $N=10$
+different sarcomas subtypes. That is, the experimental units for the
+random partition are the disease subtypes. The sampling model is
+binomial sampling, $x_i | \pi_i \sim \text{Bin}(M_i, \pi_i)$ for the number of tumor
+responses $x_i$ for a given number of patients $M_i$ under each
+sarcoma subtype, $i=1,\ldots,N$.  
+The number of patients, $M_i$ for each subtype are moderately small, between
+2 and 29.
+We implement inference using a Dirichlet process mixture of probit models. Inference under VI and squared loss reports 10 singleton clusters,
+a partition which is difficult to interpret, also because of the
+negligible differences between estimated cluster-specific response
+rates.
+See Figure \ref{fig:sarcoma_post} for a summary of the
+posterior estimated response 
+rates $\pi_i$. In contrast, the desired preference for interpretable structure
+is explicitly included in $L_{rep}$, leading us to report $\widehat{\boldsymbol{c}} = (1, 1,
+1, 1, 1, 1, 1, 1, 2, 1)$, which appears more plausible in the light of
+the estimated response probabilities (the 
+singleton cluster is Ewings' sarcoma).
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=.6\linewidth]{Img/sarcoma_posterior}
+  \caption{$90\%$ posterior credible intervals of the Binomial success
+    probabilities $\pi_i$ for each sarcoma. For reference the dashed vertical
+    line marks 0.1.} 
+\label{fig:sarcoma_post}
+\end{figure}
+
+
+There are two more aspects of inference for random partitions
+that we would like to briefly discuss. Both are related
+to the underlying data analysis problem.
+In many applications the main inference target is not the entire
+partition, but only a special subset. Assume, for example, that
+in an analysis of clinical trial data cluster-specific parameters
+$\boldsymbol{\theta}_j$ are interpreted as treatment effects.
+An important problem is to find the subset of patients who most
+benefit from the treatment under consideration, that is, the subset
+with the largest $\boldsymbol{\theta}_j$. This is known as subgroup analysis.
+Let $B=C_{j^{\star}}$ denote the subset $C_j$ with the largest $\boldsymbol{\theta}_j$.
+Characterizing uncertainty on a random partition now reduces to
+reporting uncertainty on $B$.
+\cite{schnell&al:2016} develop a clever approach to determine a pair
+of subsets $(D,S)$ such that $p(D \subseteq B \subseteq S \mid data) > 1-\alpha$.
+Subgroup analysis is in general not necessarily linked
+with random partitions and involves several other issues.
+The point here is to emphasize that relevant uncertainty on a
+random partition need not treat all subsets
+symmetrically. Investigators might only be concerned about a particular
+subset. 
+
+Finally, we would like to bring up one more aspect about summaries of
+clustering uncertainty, related to reproducibility.  Above, we used a decision
+theoretic framework to summarize a random partition with a
+good estimate that is constructed to be representative of the posterior distribution. Additionally, we report uncertainty measures that mirror the distance between the selected
+configuration and a fictitious latent partition.  Although 
+primarily meant to summarize the posterior distribution, these uncertainty measures are also vaguely
+related to the (frequentist) variability of the estimate $\widehat{\boldsymbol{c}}$. Indeed, consider repeating the entire experiment de novo,
+including both, data generation and analysis. It remains unclear how
+different the estimated configuration $\widehat{\boldsymbol{c}}$ might turn out.
+In most Bayesian estimation 
+problems of key parameters, including means or medians, estimating
+this variability is unnecessary to express uncertainty, and the focus is
+exclusively on the posterior distribution of the parameter of interest.
+But clustering is an attempt to organize data points into conveniently
+created categories. An underlying true unknown partition might be
+useless or not exist at all.  
+These considerations lead us to suggest the report of replicability measures
+that could contrast $\widehat{\boldsymbol{c}}$ and estimates under independent replicates,
+possibly including variations in the sample size.  An extended set of
+uncertainty metrics could scrutinize the main drivers of variability,
+including limitations in the measurement of the statistical units (low
+sample size for each sarcoma subtype, in the previous application),
+data preprocessing, clustering methods, and experimental designs.
+
+
+## References
+
