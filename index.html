@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Discussion of Wade and Ghahramani</title>
+  <meta name="description" content="Discussion of Wade and Ghahramani">
+  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
+
+  <meta property="og:title" content="Discussion of Wade and Ghahramani" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Discussion of Wade and Ghahramani" />
+  
+  
+  
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path=""><a href="#introduction"><i class="fa fa-check"></i>Introduction</a></li>
+<li class="chapter" data-level="" data-path=""><a href="#the-proposed-alternative"><i class="fa fa-check"></i>The proposed alternative</a></li>
+<li class="chapter" data-level="" data-path=""><a href="#results"><i class="fa fa-check"></i>Results</a></li>
+<li class="chapter" data-level="" data-path=""><a href="#other-ideas"><i class="fa fa-check"></i>Other ideas</a></li>
+<li class="chapter" data-level="" data-path=""><a href="#references"><i class="fa fa-check"></i>References</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Discussion of Wade and Ghahramani</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">Discussion of Wade and Ghahramani</h1>
+<h4 class="author"><em>Giorgio Paulon, Peter Müller, Lorenzo Trippa</em></h4>
+<address class="author_afil">
+The University of Texas at Austin<br><h4 class="date"><em>March 1, 2018</em></h4>
+</div>
+<div id="introduction" class="section level3 unnumbered">
+<h3>Introduction</h3>
+<p>We thank the authors for an interesting discussion of estimates and uncertainty summaries for random partitions. A coherent description of uncertainties is one of the strengths of the Bayesian approach, but it is difficult to summarize and report it in the case of a random partition. The clever and elegant approach of Wade and Ghahramani addresses this critical gap in the literature. However, the approach relies on loss functions that ignore the underlying inference problem that gave rise to the random partition. In other words, the loss functions are generic inference losses that ignore the context of the scientific question that the investigators are trying to address. In this discussion we would like to elaborate on the authors’ related comment that alternative loss functions could be tailored to specific problems.</p>
+</div>
+<div id="the-proposed-alternative" class="section level3 unnumbered">
+<h3>The proposed alternative</h3>
+<p>We assume that the inference problem and sampling model include cluster-specific parameters, <span class="math inline">\(\boldsymbol{\theta}_j\)</span>, <span class="math inline">\(j=1,\ldots,k_N\)</span>. For example, if <span class="math inline">\(\boldsymbol{\theta}_j\)</span> were the mean times to progression for patients in a clinical trial, the clusters would describe patient subpopulations with different mean time to progression. A summary of the random partition should then focus on partitions with meaningfully different <span class="math inline">\(\boldsymbol{\theta}_j\)</span>’s. Similarly, in some contexts, one might prefer avoiding inclusion and reporting of small clusters. Inspired by <span class="citation">Xu, Mueller, and Telesca (<a href="#ref-Xual15">2016</a>)</span> who use a determinantal point process to favor configurations with diverse cluster-specific parameters we propose the following loss function. The loss function formalizes a tradeoff between reporting clusters that are representative of the posterior and, with the second term, favoring partitions with clusters <span class="math inline">\(C_j\)</span> that are diverse: <span class="math display">\[
+  L_{rep} (\boldsymbol{c}, \widehat{\boldsymbol{c}}, \boldsymbol{\theta}^\star,
+  \widehat{\boldsymbol{\theta}}^\star) = \frac{1}{N} \sum_{n=1}^N \left(
+  \theta_{c_n}^\star - \widehat{\theta}_{\widehat{\boldsymbol{c}}_n}^\star \right)^2 -
+  \lambda \det (\widehat{\Phi}), 
+\]</span> where <span class="math inline">\([\widehat{\Phi}_{ij}]_{i,j} = \phi_\tau (\widehat{\theta}_i^\star, \widehat{\theta}_j^\star)\)</span> for some kernel <span class="math inline">\(\phi_\tau(x, y)\)</span>, e.g. the squared exponential <span class="math inline">\(\phi_\tau(x, y) = \exp\{ - 0.5 \left[ (x-y)/\tau \right]^2\}\)</span>. That is, <span class="math inline">\(\det ( \widehat{\Phi})\)</span> is the volume of a parallelotope spanned by the columns of <span class="math inline">\(\widehat{\Phi}\)</span>, which is zero when <span class="math inline">\(\theta_i^\star = \theta_j^\star\)</span> for any <span class="math inline">\(i \neq j\)</span>, and maximized when they are very distinct. Of course the squared distance in the loss can be replaced by a different distance, e.g. one that allows for asymmetric costs of misfit. The second component of the loss function could also be modified to mirror specific goals, for example penalizing configurations that include small clusters. The point here is that, in general, the particular application should drive the choice of the loss function.</p>
+</div>
+<div id="results" class="section level3 unnumbered">
+<h3>Results</h3>
+<p>We compared <span class="math inline">\(L_{rep}\)</span> with the VI loss and also with the squared loss of <span class="citation">D. B Dahl (<a href="#ref-Dahl:2006">2006</a>)</span> in the following example. Let <span class="math inline">\(\mathcal{N}(x;\; m,s)\)</span> denote a normal p.d.f. with location <span class="math inline">\(m\)</span> and scale <span class="math inline">\(s\)</span> evaluated at <span class="math inline">\(x\)</span>, and let <span class="math inline">\(\boldsymbol{\mu} = (-3, -3.5, -2.6, 0, 1.8, 2.4, 7.1)\)</span>. We simulated <span class="math inline">\(N = 1000\)</span> observations from a mixture of 7 normals, <span class="math inline">\(p(x_i \mid \boldsymbol{\mu}) \propto \sum_{j=1}^7 \mathcal{N}(x_i;\; \mu_j,1)\)</span>. We fit the data using a Dirichlet process mixture of normals model. In this case, only four components of the mixture are likely to be practically meaningful. The three values around -3 and the two around 2 are not meaningfully different (relative to the variances in the normal kernels). Inference summaries under <span class="math inline">\(L_{rep}\)</span> and VI loss are shown in Figure <a href="#fig:mixt">1</a>.</p>
+<div class="figure" style="text-align: center"><span id="fig:mixt"></span>
+<img src="Img/mixture_proposed-1.png" alt="Optimal partition for the normal mixture example (left: $L_{rep}$; right: VI)." width="49%" /><img src="Img/mixture_wade-1.png" alt="Optimal partition for the normal mixture example (left: $L_{rep}$; right: VI)." width="49%" />
+<p class="caption">
+Figure 1: Optimal partition for the normal mixture example (left: <span class="math inline">\(L_{rep}\)</span>; right: VI).
+</p>
+</div>
+<p>In this example the posterior mode for <span class="math inline">\(k_N\)</span> is <span class="math inline">\(\widehat{k}_N=7\)</span>. But both loss functions penalize excessive complexity and shrink the reported partition to the 4 groups shown in the figure. Although the VI loss does not explicitly favor easy interpretation, it does surprisingly well in this example.</p>
+<p>We used an implementation that restricted the search for the Bayes estimate of the partition under <span class="math inline">\(L_{rep}\)</span> to the simulated partitions only, which might explain the counter-intuitive lack of monotonicity in the cluster membership in Figure <a href="#fig:mixt">1</a> (left). One could alternatively use better search algorithms such as, for example, the sequentially-allocated latent structure optimization (SALSO) in the <code>sdols</code> R package of <span class="citation">David B. Dahl and Müller (<a href="#ref-sdols:2017">2017</a>)</span>. We do not show the results obtained under squared loss or Binder’s loss, since both clearly overfit the data reporting <span class="math inline">\(k_N=53\)</span> components.</p>
+<p>Next we investigate a scenario with a small number of observations. We compare the same two loss functions with a dataset from a clinical trial for sarcoma patients with binary endpoints (tumor response) <span class="citation">León-Novelo et al. (<a href="#ref-Leonal:2013">2013</a>)</span>. The goal of the study is to cluster <span class="math inline">\(N=10\)</span> different sarcomas subtypes. That is, the experimental units for the random partition are the disease subtypes. The sampling model is binomial sampling, <span class="math inline">\(x_i | \pi_i \sim \text{Bin}(M_i, \pi_i)\)</span> for the number of tumor responses <span class="math inline">\(x_i\)</span> for a given number of patients <span class="math inline">\(M_i\)</span> under each sarcoma subtype, <span class="math inline">\(i=1,\ldots,N\)</span>. The number of patients, <span class="math inline">\(M_i\)</span> for each subtype are moderately small, between 2 and 29. We implement inference using a Dirichlet process mixture of probit models. Inference under VI and squared loss reports 10 the negligible differences between estimated cluster-specific response rates. See Figure <a href="#fig:sarcomapost">2</a> for a summary of the posterior estimated response rates <span class="math inline">\(\pi_i\)</span>. In contrast, the desired preference for interpretable structure is explicitly included in <span class="math inline">\(L_{rep}\)</span>, leading us to report <span class="math inline">\(\widehat{\boldsymbol{c}} = (1, 1, 1, 1, 1, 1, 1, 1, 2, 1)\)</span>, which a singleton cluster is Ewings’ sarcoma).</p>
+<div class="figure" style="text-align: center"><span id="fig:sarcomapost"></span>
+<img src="Img/sarcoma_posterior-1.png" alt="\%90 posterior credible intervals of the Binomial success probabilities for each sarcoma. For reference the dashed vertical line marks 0.1." width="80%" />
+<p class="caption">
+Figure 2: %90 posterior credible intervals of the Binomial success probabilities for each sarcoma. For reference the dashed vertical line marks 0.1.
+</p>
+</div>
+</div>
+<div id="other-ideas" class="section level3 unnumbered">
+<h3>Other ideas</h3>
+<p>There are two more aspects of inference for random partitions that we would like to briefly discuss. Both are related to the underlying data analysis problem. In many applications the main inference target is not the entire partition, but only a special subset. Assume, for example, that in an analysis of clinical trial data cluster-specific parameters <span class="math inline">\(\boldsymbol{\theta}_j\)</span> are interpreted as treatment effects. An important problem is to find the subset of patients who most benefit from the treatment under consideration, that is, the subset with the largest <span class="math inline">\(\boldsymbol{\theta}_j\)</span>. This is known as subgroup analysis. Let <span class="math inline">\(B=C_{j^{\star}}\)</span> denote the subset <span class="math inline">\(C_j\)</span> with the largest <span class="math inline">\(\boldsymbol{\theta}_j\)</span>. Characterizing uncertainty on a random partition now reduces to reporting uncertainty on <span class="math inline">\(B\)</span>. <span class="citation">Schnell et al. (<a href="#ref-schnellal:2016">2016</a>)</span> develop a clever approach to determine a pair of subsets <span class="math inline">\((D,S)\)</span> such that <span class="math inline">\(p(D \subseteq B \subseteq S \mid data) &gt; 1-\alpha\)</span>. Subgroup analysis is in general not necessarily linked with random partitions and involves several other issues. The point here is to emphasize that relevant uncertainty on a random partition need not treat all subsets symmetrically. Investigators might only be concerned about a particular subset.</p>
+<p>Finally, we would like to bring up one more aspect about summaries of clustering uncertainty, related to reproducibility. Above, we used a decision theoretic framework to summarize a random partition with a good estimate that is constructed to be representative of the posterior distribution. Additionally, we report uncertainty measures that mirror the distance between the selected configuration and a fictitious latent partition. Although primarily meant to summarize the posterior distribution, these uncertainty measures are also vaguely related to the (frequentist) variability of the estimate <span class="math inline">\(\widehat{\boldsymbol{c}}\)</span>. Indeed, consider repeating the entire experiment de novo, including both, data generation and analysis. It remains unclear how different the estimated configuration <span class="math inline">\(\widehat{\boldsymbol{c}}\)</span> might turn out. In most Bayesian estimation problems of key parameters, including means or medians, estimating this variability is unnecessary to express uncertainty, and the focus is exclusively on the posterior distribution of the parameter of interest. But clustering is an attempt to organize data points into conveniently created categories. An underlying true unknown partition might be useless or not exist at all. These considerations lead us to suggest the report of replicability measures that could contrast <span class="math inline">\(\widehat{\boldsymbol{c}}\)</span> and estimates under independent replicates, possibly including variations in the sample size. An extended set of uncertainty metrics could scrutinize the main drivers of variability, including limitations in the measurement of the statistical units (low sample size for each sarcoma subtype, in the previous application), data preprocessing, clustering methods, and experimental designs.</p>
+</div>
+<div id="references" class="section level3 unnumbered">
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-Dahl:2006">
+<p>Dahl, D. B. 2006. “Model-Based Clustering for Expression Data via a Dirichlet Process Mixture Model.” In <em>Bayesian Inference for Gene Expression and Proteomics</em>, edited by Marina Vannucci, Kim-Anh Do, and Peter Müller. Cambridge University Press.</p>
+</div>
+<div id="ref-sdols:2017">
+<p>Dahl, David B., and Peter Müller. 2017. <em><code>sdols</code>: Summarizing Distributions of Latent Structures</em>. <a href="https://CRAN.R-project.org/package=sdols" class="uri">https://CRAN.R-project.org/package=sdols</a>.</p>
+</div>
+<div id="ref-Leonal:2013">
+<p>León-Novelo, Luis G., Peter Müller, Wadih Arap, Mikhail Kolonin, Jessica Sun, Renata Pasqualini, and Kim-Anh Do. 2013. “Semiparametric Bayesian Inference for Phage Display Data.” <em>Biometrics</em> 69 (1): 174–83.</p>
+</div>
+<div id="ref-schnellal:2016">
+<p>Schnell, Patrick M., Qi Tang, Walter W. Offen, and Bradley P. Carlin. 2016. “A Bayesian Credible Subgroups Approach to Identifying Patient Subgroups with Positive Treatment Effects.” <em>Biometrics</em> 72: 1026–36.</p>
+</div>
+<div id="ref-Xual15">
+<p>Xu, Yanxun, Peter Mueller, and Donatello Telesca. 2016. “Bayesian Inference for Latent Biologic Structure with Determinantal Point Processes (Dpp).” <em>Biometrics</em> 72: 955–64.</p>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+},
+"search": false
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "";
+    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
